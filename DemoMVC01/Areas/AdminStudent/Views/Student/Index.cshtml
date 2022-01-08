@@ -1,0 +1,318 @@
+﻿@using DemoMVC01.Areas.AdminStudent.ViewModels
+
+
+@model IEnumerable<StudentVM>
+@{
+    var searchValue = Context.Request.Query["searchValue"];
+    int pageIndex;
+    bool isInt = int.TryParse(Context.Request.Query["pageIndex"], out pageIndex);
+    if (!isInt)
+    {
+        pageIndex = 1;
+    }
+    int pageSize;
+    bool pageSizeIsInt = int.TryParse(Context.Request.Query["pageSize"], out pageSize);
+    if (!pageSizeIsInt)
+    {
+        pageSize = 10;
+    }
+
+
+    string orderBy = Context.Request.Query["orderBy"];
+
+    string currentOrderBy = string.Empty;
+    if (!string.IsNullOrEmpty(orderBy))
+    {
+        var segments = orderBy.Split("_");
+        currentOrderBy = segments[0];
+
+        if (segments[1] == "asc")
+        {
+            orderBy = "desc";
+        }
+        else
+        {
+            orderBy = "asc";
+        }
+    }
+
+
+}
+
+
+@await Html.PartialAsync("/Views/Partial/_ViewPartial.cshtml", "Student management")
+
+<form asp-action="Index" method="get">
+    <input type="text" name="searchValue" value="@searchValue" />
+    <input type="hidden" name="pageSize" value="@pageSize" />
+    <button type="submit">Search</button>
+</form>
+
+<h3>List of students</h3>
+<a asp-controller="Student" asp-action="Create">Create New</a>
+<button id="studentCheckboxDelete">Delete</button>
+<table id="studentTable">
+    <tr>
+        <th><input type="checkbox" id="studentCheckboxAll" /></th>
+        <th>No.</th>
+        <th>
+            @if (currentOrderBy == "name")
+            {
+                @*<a href="/Admin/Student/Index?pageIndex=@((pageIndex==1)?1:pageIndex-1)&searchValue=@searchValue&pageSize=@pageSize&orderBy=name_@orderBy">Name</a>*@
+                <a asp-action="Index" asp-controller="Student" asp-area="Admin"
+               asp-route-pageIndex=@((pageIndex==1)?1:pageIndex-1)
+               asp-route-searchValue=@searchValue
+               asp-route-pageSize=@pageSize
+               asp-route-orderBy=name_@orderBy>
+                    @Html.DisplayNameFor(model => model.Name)
+                </a>
+            }
+            else
+            {
+                <a asp-action="Index" asp-controller="Student" asp-area="Admin"
+               asp-route-pageIndex=@((pageIndex==1)?1:pageIndex-1)
+               asp-route-searchValue=@searchValue
+               asp-route-pageSize=@pageSize
+               asp-route-orderBy=name_asc>
+                    @Html.DisplayNameFor(model => model.Name)
+                </a>
+            }
+        </th>
+        <th>
+            @if (currentOrderBy == "phone")
+            {
+                <a href="/Admin/Student/Index?pageIndex=@((pageIndex==1)?1:pageIndex-1)&searchValue=@searchValue&pageSize=@pageSize&orderBy=phone_@orderBy">@Html.DisplayNameFor(model => model.PhoneNumber)</a>
+            }
+            else
+            {
+                <a href="/Admin/Student/Index?pageIndex=@((pageIndex==1)?1:pageIndex-1)&searchValue=@searchValue&pageSize=@pageSize&orderBy=phone_asc">@Html.DisplayNameFor(model => model.PhoneNumber)</a>
+            }
+        </th>
+        <th>
+            @if (currentOrderBy == "email")
+            {
+                <a href="/Admin/Student/Index?pageIndex=@((pageIndex==1)?1:pageIndex-1)&searchValue=@searchValue&pageSize=@pageSize&orderBy=email_@orderBy">@Html.DisplayNameFor(model => model.EmailAddress)</a>
+            }
+            else
+            {
+                <a href="/Admin/Student/Index?pageIndex=@((pageIndex==1)?1:pageIndex-1)&searchValue=@searchValue&pageSize=@pageSize&orderBy=email_asc">@Html.DisplayNameFor(model => model.EmailAddress)</a>
+            }
+
+        </th>
+        <th>
+            @if (currentOrderBy == "majorName")
+            {
+                <a href="/Admin/Student/Index?pageIndex=@((pageIndex==1)?1:pageIndex-1)&searchValue=@searchValue&pageSize=@pageSize&orderBy=majorName_@orderBy">@Html.DisplayNameFor(model => model.Major.Name)</a>
+            }
+            else
+            {
+                <a href="/Admin/Student/Index?pageIndex=@((pageIndex==1)?1:pageIndex-1)&searchValue=@searchValue&pageSize=@pageSize&orderBy=majorName_asc">@Html.DisplayNameFor(model => model.Major.Name)</a>
+            }
+
+        </th>
+    </tr>
+    @{
+        var no = 0;
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><input type="checkbox" class="studentCheckbox" name="id" value="@item.Id"></td>
+                <td>@(pageSize*(pageIndex-1)+no++ + 1)</td>
+                <td>@item.Name</td>
+                <td>@item.PhoneNumber</td>
+                <td>@item.EmailAddress</td>
+                <td>@item.Major.Name</td>
+                <td>
+                    <a asp-controller="Student" asp-action="Details" asp-route-id=@item.Id>Details</a>
+                </td>
+                <td>
+                    <a asp-controller="Student" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary mx-1">Edit</a>
+                </td>
+                <td>
+                    <button type="button" data-id="@item.Id" class="linkdelete">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    }
+    @*
+        @for (int i = 0; i < Model.Count; i++)
+        {
+        var student = Model[i];
+        <tr>
+        <td><input type="checkbox" class="studentCheckbox" name="id" value="@student.Id"></td>
+        <td>@(pageSize*(pageIndex-1)+i + 1)</td>
+        <td>@student.Name</td>
+        <td>@student.PhoneNumber</td>
+        <td>@student.EmailAddress</td>
+        <td>@student.Major.Name</td>
+        <td>
+        <a asp-controller="Student" asp-action="Edit" asp-route-id="@student.Id" class="btn btn-primary mx-1">Edit</a>
+        </td>
+        <td>
+        <button type="button" data-id="@student.Id" class="linkdelete">
+        Delete
+        </button>
+        </td>
+        </tr>
+        }
+    *@
+</table>
+
+<div class="pagination">
+    @{
+        <a href="/Admin/Student/Index?pageIndex=@((pageIndex==1)?1:pageIndex-1)&searchValue=@searchValue&pageSize=@pageSize">previous</a>
+        if (pageIndex > 5)
+        {
+            for (var i = pageIndex - 5; i < pageIndex + 5; i++)
+            {
+                if (i <= ViewBag.MaxPage)
+                {
+                    <a href="/Admin/Student/Index?pageIndex=@i&searchValue=@searchValue&pageSize=@pageSize">@i</a>
+                }
+            }
+        }
+        else
+        {
+            for (var i = 1; i < 11; i++)
+            {
+                if (i <= ViewBag.MaxPage)
+                {
+                    <a href="/Admin/Student/Index?pageIndex=@i&searchValue=@searchValue&pageSize=@pageSize">@i</a>
+                }
+            }
+        }
+        <a href="/Admin/Student/Index?pageIndex=@((pageIndex==ViewBag.MaxPage)?pageIndex:pageIndex+1)&searchValue=@searchValue&pageSize=@pageSize">next</a>
+
+        <label>Page Size</label>
+        <select id="selectPageSize" name="pageSize">
+            @for (var i = 1; i < 5; i++)
+            {
+                @if (pageSize == (i * 10))
+                {
+                    <option selected value="@(i * 10)">@(i * 10)</option>
+                }
+                else
+                {
+                    <option value="@(i * 10)">@(i * 10)</option>
+                }
+            }
+        </select>
+
+    }
+
+
+
+
+</div>
+
+@section CustomScript
+{
+<script>
+    $('#selectPageSize').on('change', function() {
+        var e = document.getElementById("selectPageSize");
+        window.location = `/Admin/Student/Index?pageSize=${e.value}&searchValue=@searchValue&orderBy=@(Context.Request.Query["orderBy"])`;
+    });
+
+    $('.linkdelete').on('click', function() {
+
+        var rowCount = $("#studentTable tr").length;
+
+        if (rowCount==2) {
+            function Abc() {
+                var e = document.getElementById("selectPageSize");
+                window.location = `/Admin/Student/Index?pageIndex=@(pageIndex == 1 ? 1 : pageIndex - 1)&pageSize=${e.value}&searchValue=@searchValue&orderBy=@(Context.Request.Query["orderBy"])`;
+            }
+        } else {
+            function Abc() {
+                window.location.reload();
+            }
+        }
+        var idList=[$(this).data("id")];
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("Delete","Student")",
+            data: {
+                idList:idList
+            },
+            dataType: "json",
+            success: function (data) {
+                Abc();
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    });
+
+    $('#studentCheckboxAll').on('change',function(){
+        if($(this).prop('checked')){
+            $('.studentCheckbox').each(function(){
+                $(this).prop('checked', true);
+            });
+        }else{
+            $('tr td input[type="checkbox"]').each(function(){
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $('.studentCheckbox').each(function(){
+
+        $(this).on('change', function(){
+            var flag=false;
+            if($(this).prop('checked')){
+                $('#studentCheckboxAll').prop('checked', true);
+            }else{
+                $('.studentCheckbox').each(function(){
+                    if($(this).prop('checked')){
+                        flag=true;
+                    }
+                });
+                if(!flag){
+                    $('#studentCheckboxAll').prop('checked', false);
+                }
+            }
+        });
+    });
+
+    $('#studentCheckboxDelete').on('click', function(){
+        if (rowCount==2) {
+            function Abc() {
+                var e = document.getElementById("selectPageSize");
+                window.location = `/Admin/Student/Index?pageIndex=@(pageIndex == 1 ? 1 : pageIndex - 1)&pageSize=${e.value}&searchValue=@searchValue&orderBy=@(Context.Request.Query["orderBy"])`;
+            }
+        } else {
+            function Abc() {
+                window.location.reload();
+            }
+        }
+       var idList=[];
+        $('.studentCheckbox').each(function(){
+            if($(this).prop('checked')){
+                idList.push($(this).val());
+            }
+        });
+        var rowCount = $("#studentTable tr").length;
+        
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("Delete","Student")",
+            data: {
+                idList:idList
+            },
+            dataType: "json",
+            success: function (data) {
+                Abc();
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    });
+
+</script>
+}
+
+

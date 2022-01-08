@@ -1,0 +1,131 @@
+﻿@using DemoMVC01.Areas.Identity.ViewModels.Account
+@using Microsoft.AspNetCore.Identity
+
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+    var returnUrl = @ViewData["ReturnUrl"];
+}
+
+<h1>@ViewData["Title"].</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <section>
+            <form asp-controller="Account" asp-action="Register" asp-route-returnurl=returnUrl method="post" class="form-horizontal" role="form">
+                <h4>Tạo tài khoản mới trên website.</h4>
+                <hr />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Username" class="col-md-10 control-label"></label>
+                    <div class="col-md-10">
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="col-md-10 control-label"></label>
+                    <div class="col-md-10">
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="col-md-10 control-label"></label>
+                    <div class="col-md-10">
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword" class="col-md-10 control-label"></label>
+                    <div class="col-md-10">
+                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <button type="submit" class="btn btn-primary">Đăng ký</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+    <div class="col-md-4">
+        <section>
+            <h4>Đăng nhập bằng tài khoản.</h4>
+            <hr />
+            @{
+
+                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                {
+                    <div>
+                        <p>
+                            There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+                            for details on setting up this ASP.NET application to support logging in via external services.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <form id="external-account" asp-controller="Account" asp-action="ExternalLogin" asp-route-returnUrl=@returnUrl method="post" class="form-horizontal">
+                        <div>
+                            <p>
+                                @foreach (var provider in Model.ExternalLogins)
+                                {
+                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                }
+                            </p>
+                        </div>
+                    </form>
+                }
+            }
+        </section>
+    </div>
+</div>
+
+
+
+@section Scripts {
+
+
+<script>
+            $('#id1').on("click", function(){
+                var value="aaa1";
+                $.ajax({
+                        type: "GET",
+                        async: false,
+                        url: '/Identity/account/UsernameExists',
+                        data: {
+                            Username:value
+                        },
+                        dataType: "json",
+
+                        success: function (data) {alert(data);
+                            if(data){
+                                return false;
+                            }else{
+                                return true;
+                            }
+                        }
+                    });
+            });
+
+            $.validator.addMethod("name", function (value, element, param) {
+                if(value=="aaaa1"){
+                    return false;
+                }else{
+                    return true;
+                }
+               
+});
+            $.validator.unobtrusive.adapters.addBool("name");
+
+            
+
+</script>
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

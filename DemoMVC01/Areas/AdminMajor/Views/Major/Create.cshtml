@@ -1,0 +1,83 @@
+﻿@using DemoMVC01.Models
+
+
+@model Major
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Major</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<a id="id1">Username exists</a>
+
+        
+@section CustomScript
+{
+<script>
+    function load() {
+    setTimeout(function () {
+        $.ajax({
+                        type: "GET",
+                        async: false,
+                        url: '/Identity/account/UsernameExists',
+                        data: {
+                            Username:"aaa1"
+                        },
+                        dataType: "json",
+
+                        success: function (data) {alert(data);
+                            if(data){
+                                return false;
+                            }else{
+                                return true;
+                            }
+                        }
+                    });
+    }, 1101);
+$.validator.addMethod("name", function (value, element, param) {
+    f (value == "aaaa") {
+        return false;
+    }
+    else {
+        return true;
+    }
+    
+});
+
+}
+
+@*
+$.validator.unobtrusive.adapters.add
+	("name", ["param"], function (options) {
+
+    options.rules["name"] = options.params.param;
+    options.messages["name"] = options.message;
+});*@
+$.validator.unobtrusive.adapters.addBool("name");
+$('#id1').on("click", function(){
+            alert();
+        });
+</Script>
+}
