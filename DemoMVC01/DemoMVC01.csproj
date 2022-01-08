@@ -27,6 +27,7 @@
     <Folder Include="Areas\AdminStudent\Models\" />
     <Folder Include="Areas\AdminMajor\Data\" />
     <Folder Include="mailssave\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

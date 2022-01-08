@@ -38,7 +38,7 @@ namespace DemoMVC01.Areas.Identity.Controllers
         }
 
         // GET: /Account/Login
-       
+        [HttpGet("/login/")]
         [AllowAnonymous]
         public async Task<dynamic> Login(string returnUrl = null)
         {
